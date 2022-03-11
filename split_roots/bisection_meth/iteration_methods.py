@@ -10,6 +10,9 @@ from base_objs import Range
 # default max count of cycle runs
 ITERATIONS_MAX_COUNT = 10
 
+# Debug is ON flag
+DEBUG = False
+
 
 
 def Bisec(f: Lambda, range: Range, accurasy: float, iteration_max_count: int = ITERATIONS_MAX_COUNT) -> float:
@@ -54,8 +57,12 @@ def Bisec(f: Lambda, range: Range, accurasy: float, iteration_max_count: int = I
 
         counter += 1
 
-    raise Exception("Root was not found after " + counter + " iterations")
-
+    raise Exception(
+        "Root was not found after " + str(counter) + " iterations" + "\n" + \
+        "Accuracy was not reached"                                 + "\n" + \
+        "The approcsimate value: " + str(c)                        + "\n" + \
+        "Accuracy:               " + str(fabs(b - a))
+    )
 
 def BasicIter(f: Lambda, phi: Lambda, range: Range, accurasy: float, iteration_max_count: int = ITERATIONS_MAX_COUNT) -> float:
 
@@ -71,21 +78,39 @@ def BasicIter(f: Lambda, phi: Lambda, range: Range, accurasy: float, iteration_m
     assert(range.start >= range.end, "Incorrect range: a < b")
 
 
-    x_prev = range.start
-    x_next = 0
+    # debug
+    if (DEBUG):
+        print("Start of range\t:\t", range.start, sep="")
+        print("End of range\t:\t", range.end, sep="")
+
+
+    x_prev = 0
+    x_next = range.start
+
 
     # calculations themself
     while (counter < iteration_max_count):
 
+        x_prev = x_next
         x_next = phi(x_prev)
+
+        # debug
+        if (DEBUG):
+            print("x_k =",   x_prev)
+            print("x_k+1 =", x_next)
 
         # out of range
         assert(x_next <= range.end, "No roots are there in the " + range.to_str())
 
         # root found
-        if fabs(x_next - x_prev):
+        if fabs(x_next - x_prev) < accurasy:
             return x_next
 
         counter += 1
 
-    raise Exception("Root was not found after " + counter + " iterations")
+    raise Exception(
+        "Root was not found after " + str(counter) + " iterations" + "\n" + \
+        "Accuracy was not reached"                                 + "\n" + \
+        "The approcsimate value: " + str(x_next)                   + "\n" + \
+        "Accuracy:               " + str(fabs(x_next - x_prev))
+    )

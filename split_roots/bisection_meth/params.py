@@ -13,13 +13,13 @@ from base_objs import Range
 MAX_COUNTER_VALUE = 20
 
 # accuracy
-EPS     = 1e-2
+EPS     = 1e-4
 
 # equation function
-FUNC    = lambda x : x**5 + 2*x - 8
+FUNC    = lambda x : x**2 - exp(-x)
 
 # root search range
-RANGE   = Range(0, 3)
+RANGE   = Range(0.5, 1)
 
 # iteration function (for basic iter meth)
 PHI     = lambda x : exp( -x/2 )

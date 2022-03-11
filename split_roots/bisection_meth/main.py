@@ -2,9 +2,9 @@
 
 # import params
 from unittest import TestCase
-from params import EPS, FUNC, RANGE, MAX_COUNTER_VALUE
+from params import EPS, FUNC, RANGE, MAX_COUNTER_VALUE, PHI
 # import process func
-from iteration_methods import Bisec
+from iteration_methods import Bisec, BasicIter
 # import plot library
 #from matplotlib import pyplot
 
@@ -30,7 +30,7 @@ def main():
 
     try:
 
-        x = Bisec(FUNC, RANGE, EPS, MAX_COUNTER_VALUE)
+        x = BasicIter(FUNC, PHI, RANGE, EPS, MAX_COUNTER_VALUE)
 
         print(
             "Root was successfully found:\n",
