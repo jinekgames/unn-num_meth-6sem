@@ -6,7 +6,8 @@ from params import EPS, FUNC, RANGE, MAX_COUNTER_VALUE, PHI
 # import process func
 from iteration_methods import Bisec, BasicIter
 # import plot library
-#from matplotlib import pyplot
+import matplotlib.pyplot as plot
+import numpy as np
 
 import sys
 import linecache
@@ -30,11 +31,12 @@ def main():
 
     try:
 
-        x = BasicIter(FUNC, PHI, RANGE, EPS, MAX_COUNTER_VALUE)
+        x = Bisec(FUNC, RANGE, EPS, MAX_COUNTER_VALUE)
 
         print(
             "Root was successfully found:\n",
-            "x = ", x, "+-", EPS,
+            "x    = ", x, " +- ", EPS, "\n",
+            "f(x) = ", FUNC(x),
             sep=""
         )
 
@@ -42,9 +44,16 @@ def main():
         print(TextException())
 
 
-    # TODO: plot
+    # Plot
+    t = np.arange(RANGE.start, RANGE.end, 0.1)
+    fig, ax = plot.subplots()
+    ax.set_title("Root: " + str(x) + " +- " + str(EPS))
+    plot.plot(t, FUNC(t), "r--")
+    plot.plot([x], [FUNC(x)], "bo")
+    plot.show()
 
 
 
 if __name__ == "__main__":
     main()
+    print("мучас грасиас офишион ешто паравасотрощ шууууууууууу")

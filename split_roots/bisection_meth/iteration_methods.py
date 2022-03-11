@@ -14,6 +14,19 @@ ITERATIONS_MAX_COUNT = 10
 DEBUG = False
 
 
+def GetFloatDigitsCount(x: float) -> float:
+    """
+    Returns count of digits after point
+    """
+    return len(str(x).split('.')[1])
+
+def RoundByAccur(x: float, accuracy: float) -> float:
+    """
+    Rounds the float X according to given accuracy
+    """
+    return float(f"{x:.{GetFloatDigitsCount(accuracy)}f}")
+
+
 
 def Bisec(f: Lambda, range: Range, accurasy: float, iteration_max_count: int = ITERATIONS_MAX_COUNT) -> float:
 
@@ -53,15 +66,15 @@ def Bisec(f: Lambda, range: Range, accurasy: float, iteration_max_count: int = I
 
         # root found
         if b - a <= accurasy * 2:
-            return c
+            return RoundByAccur(c, accurasy)
 
         counter += 1
 
     raise Exception(
-        "Root was not found after " + str(counter) + " iterations" + "\n" + \
-        "Accuracy was not reached"                                 + "\n" + \
-        "The approcsimate value: " + str(c)                        + "\n" + \
-        "Accuracy:               " + str(fabs(b - a))
+        "Root was not found after " + str(counter) + " iterations"      + "\n" + \
+        "Accuracy was not reached"                                      + "\n" + \
+        "The approcsimate value: "  + str(RoundByAccur(c, accurasy))    + "\n" + \
+        "Accuracy:               "  + str(fabs(b - a))
     )
 
 def BasicIter(f: Lambda, phi: Lambda, range: Range, accurasy: float, iteration_max_count: int = ITERATIONS_MAX_COUNT) -> float:
@@ -104,13 +117,13 @@ def BasicIter(f: Lambda, phi: Lambda, range: Range, accurasy: float, iteration_m
 
         # root found
         if fabs(x_next - x_prev) < accurasy:
-            return x_next
+            return RoundByAccur(x_next, accurasy)
 
         counter += 1
 
     raise Exception(
-        "Root was not found after " + str(counter) + " iterations" + "\n" + \
-        "Accuracy was not reached"                                 + "\n" + \
-        "The approcsimate value: " + str(x_next)                   + "\n" + \
-        "Accuracy:               " + str(fabs(x_next - x_prev))
+        "Root was not found after " + str(counter) + " iterations"          + "\n" + \
+        "Accuracy was not reached"                                          + "\n" + \
+        "The approcsimate value: "  + str(RoundByAccur(x_next, accurasy))    + "\n" + \
+        "Accuracy:               "  + str(fabs(x_next - x_prev))
     )
