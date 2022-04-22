@@ -1,30 +1,26 @@
-# iteration methods for root refinement
+# iteration methods for root refinement for single equation
 
 from math import fabs
 
 # import some structures
 from ast import Lambda
-from base_objs import Range
+from pickle import TRUE
+
+from sympy import false, true
+#from ..common.objects import *
+from base_objs import *
 
 
 # default max count of cycle runs
-ITERATIONS_MAX_COUNT = 10
+ITERATIONS_MAX_COUNT = 52
+# float type contains 52 bytes of lyterals
+# thats why we can devide 52 times to get the maximum accuracy in bython float type
 
 # Debug is ON flag
-DEBUG = False
+DEBUG = TRUE
 
-
-def GetFloatDigitsCount(x: float) -> float:
-    """
-    Returns count of digits after point
-    """
-    return len(str(x).split('.')[1])
-
-def RoundByAccur(x: float, accuracy: float) -> float:
-    """
-    Rounds the float X according to given accuracy
-    """
-    return float(f"{x:.{GetFloatDigitsCount(accuracy)}f}")
+# Count of space symbols in the table Debug output
+TABLE_INT_PART_SIZE = 5
 
 
 
@@ -42,7 +38,27 @@ def Bisec(f: Lambda, range: Range, accurasy: float, iteration_max_count: int = I
     b = range.end
 
     # range validation
-    assert(a >= b, "Incorrect range: a < b")
+    assert a <= b, "Incorrect range: a < b"
+
+    # accuracy validation
+    assert accurasy < 1, "Accuracy should be less then 1"
+
+
+    # debug
+    tableColSize = GetFloatDigitsCount(accurasy) + GetIntDigitsCount(f((range.start + range.end)/2)) + 1 + ACCURACY_ROUND_OFFSET
+    if (DEBUG):
+        print("\n\nBisection meth for eq.\n")
+        print("Start of range\t:\t", range.start, sep="")
+        print("End of range\t:\t", range.end, sep="")
+        print()
+        print("┌" + "─"*3, "─"*tableColSize, "─"*tableColSize, "─"*tableColSize + "─┐", sep="─┬─")
+        print(
+            "│" + "k".center(3),
+            "x".center(tableColSize),
+            "f(x)".center(tableColSize),
+            "Delta".center(tableColSize) + " │",
+            sep=" │ "
+        )
 
 
     # calculations themself
@@ -58,14 +74,30 @@ def Bisec(f: Lambda, range: Range, accurasy: float, iteration_max_count: int = I
             a = c
         # one of the range edges if the root
         elif f(a) == 0 or f(b) == 0:
-            raise Exception("Root is on the edge, this case have not been designed")
+            raise Exception("Root is on the edge, this case have not been designed yet")
         # no root in the range
         else:
             raise Exception("No roots are there in the " + range.to_str())
 
+            
+        # debug
+        if (DEBUG):
+            print("├" + "─"*3, "─"*tableColSize, "─"*tableColSize, "─"*tableColSize + "─┤", sep="─┼─")
+            print(
+                "│" + str(counter).rjust(3),
+                str(RoundByAccur( c,                 accurasy )).rjust(tableColSize),
+                str(RoundByAccur( f(c),              accurasy )).rjust(tableColSize),
+                str(RoundByAccur( fabs((b) - (a)),   accurasy )).rjust(tableColSize) + " │",
+                sep=" │ "
+            )
+
 
         # root found
-        if b - a <= accurasy * 2:
+        if fabs((b) - (a)) <= accurasy:
+            # debug
+            if (DEBUG):
+                print("└" + "─"*3, "─"*tableColSize, "─"*tableColSize, "─"*tableColSize + "─┘", sep="─┴─")
+
             return RoundByAccur(c, accurasy)
 
         counter += 1
@@ -77,7 +109,7 @@ def Bisec(f: Lambda, range: Range, accurasy: float, iteration_max_count: int = I
         "Accuracy:               "  + str(fabs(b - a))
     )
 
-def BasicIter(f: Lambda, phi: Lambda, range: Range, accurasy: float, iteration_max_count: int = ITERATIONS_MAX_COUNT) -> float:
+def BasicIter(f: Lambda, phi: Lambda, x_start: float, accurasy: float, iteration_max_count: int = ITERATIONS_MAX_COUNT) -> float:
 
     """
     Basic iteration method
@@ -87,18 +119,28 @@ def BasicIter(f: Lambda, phi: Lambda, range: Range, accurasy: float, iteration_m
     # to break unlim cycles
     counter = 0
 
-    # range validation
-    assert(range.start >= range.end, "Incorrect range: a < b")
+    # accuracy validation
+    assert accurasy < 1, "Accuracy should be less then 1"
 
 
     # debug
+    tableColSize = GetFloatDigitsCount(accurasy) + GetIntDigitsCount(f(x_start)) + 1 + ACCURACY_ROUND_OFFSET
     if (DEBUG):
-        print("Start of range\t:\t", range.start, sep="")
-        print("End of range\t:\t", range.end, sep="")
+        print("\n\nBasic Iter meth for eq.\n")
+        print("Start of search\t:\t", x_start, sep="")
+        print()
+        print("┌" + "─"*3, "─"*tableColSize, "─"*tableColSize, "─"*tableColSize + "─┐", sep="─┬─")
+        print(
+            "│" + "k".center(3),
+            "x".center(tableColSize),
+            "f(x)".center(tableColSize),
+            "Delta".center(tableColSize) + " │",
+            sep=" │ "
+        )
 
 
     x_prev = 0
-    x_next = range.start
+    x_next = x_start
 
 
     # calculations themself
@@ -109,14 +151,21 @@ def BasicIter(f: Lambda, phi: Lambda, range: Range, accurasy: float, iteration_m
 
         # debug
         if (DEBUG):
-            print("x_k =",   x_prev)
-            print("x_k+1 =", x_next)
-
-        # out of range
-        assert(x_next <= range.end, "No roots are there in the " + range.to_str())
-
+            print("├" + "─"*3, "─"*tableColSize, "─"*tableColSize, "─"*tableColSize + "─┤", sep="─┼─")
+            print(
+                "│" + str(counter).rjust(3),
+                str(RoundByAccur( x_next,                       accurasy )).rjust(tableColSize),
+                str(RoundByAccur( f(x_next),                    accurasy )).rjust(tableColSize),
+                str(RoundByAccur( fabs((x_next) - (x_prev)),    accurasy )).rjust(tableColSize) + " │",
+                sep=" │ "
+            )
+            
         # root found
-        if fabs(x_next - x_prev) < accurasy:
+        if fabs((x_next) - (x_prev)) < accurasy:
+            # debug
+            if (DEBUG):
+                print("└" + "─"*3, "─"*tableColSize, "─"*tableColSize, "─"*tableColSize + "─┘", sep="─┴─")
+
             return RoundByAccur(x_next, accurasy)
 
         counter += 1
@@ -124,6 +173,74 @@ def BasicIter(f: Lambda, phi: Lambda, range: Range, accurasy: float, iteration_m
     raise Exception(
         "Root was not found after " + str(counter) + " iterations"          + "\n" + \
         "Accuracy was not reached"                                          + "\n" + \
-        "The approcsimate value: "  + str(RoundByAccur(x_next, accurasy))    + "\n" + \
+        "The approcsimate value: "  + str(RoundByAccur(x_next, accurasy))   + "\n" + \
         "Accuracy:               "  + str(fabs(x_next - x_prev))
     )
+
+def Newtone(f: Lambda, deriv: Lambda, x_start: float, accurasy: float, iteration_max_count: int = ITERATIONS_MAX_COUNT) -> float:
+
+    """
+    Neqtone method
+    deriv is deriviative of f function
+    """
+
+    # to break unlim cycles
+    counter = 0
+
+    # accuracy validation
+    assert accurasy < 1, "Accuracy should be less then 1"
+
+
+    # debug
+    tableColSize = GetFloatDigitsCount(accurasy) + GetIntDigitsCount(f(x_start)) + 1 + ACCURACY_ROUND_OFFSET
+    if (DEBUG):
+        print("\n\nNewtone meth for eq.\n")
+        print("Start of search\t:\t", x_start, sep="")
+        print()
+        print("┌" + "─"*3, "─"*tableColSize, "─"*tableColSize, "─"*tableColSize + "─┐", sep="─┬─")
+        print(
+            "│" + "k".center(3),
+            "x".center(tableColSize),
+            "f(x)".center(tableColSize),
+            "Delta".center(tableColSize) + " │",
+            sep=" │ "
+        )
+
+
+    x_prev = x_start
+    x_next = 0
+
+
+    # calculations themself
+    while (counter < iteration_max_count):
+
+        x_next = x_prev - f(x_prev) / deriv(x_prev)
+
+        # debug
+        if (DEBUG):
+            print("├" + "─"*3, "─"*tableColSize, "─"*tableColSize, "─"*tableColSize + "─┤", sep="─┼─")
+            print(
+                "│" + str(counter).rjust(3),
+                str(RoundByAccur(      x_next,             accurasy )).rjust(tableColSize),
+                str(RoundByAccur(    f(x_next),            accurasy )).rjust(tableColSize),
+                str(RoundByAccur( fabs(x_next) - (x_prev), accurasy )).rjust(tableColSize) + " │",
+                sep=" │ "
+            )
+
+        # root found
+        if fabs(x_next - x_prev) < accurasy:
+            # debug
+            if (DEBUG):
+                print("└" + "─"*3, "─"*tableColSize, "─"*tableColSize, "─"*tableColSize + "─┘", sep="─┴─")
+
+            return RoundByAccur(x_next, accurasy)
+
+        x_prev = x_next
+        counter += 1
+
+    raise Exception(
+        "Root was not found after " + str(counter) + " iterations"          + "\n" + \
+        "Accuracy was not reached"                                          + "\n" + \
+        "The approcsimate value: "  + str(RoundByAccur(x_next, accurasy))   + "\n" + \
+        "Accuracy:               "  + str(fabs(x_next - x_prev))
+    )\

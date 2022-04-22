@@ -43,7 +43,7 @@ def TextException():
 
 
 # Accuracy offset
-ACCURACY_ROUND_OFFSET = 4
+ACCURACY_ROUND_OFFSET = 5
 # u can increase count of symbols after point using this constant
 
 def GetIntDigitsCount(x: float) -> int:
@@ -59,7 +59,11 @@ def GetFloatDigitsCount(x: float) -> int:
     try:
         return len(str(x).split('.')[1])
     except BaseException:
-        return int(str(x).split('-')[1])
+        try:
+            return int(str(x).split('-')[1])
+        except BaseException:
+            return 0
+
 
 def RoundBySymbCount(x: float, symb_count: float) -> float:
     """

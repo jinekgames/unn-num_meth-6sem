@@ -2,7 +2,8 @@
 
 # Imports
 
-from math import exp
+from math import exp, log10, log, fabs
+import numpy as np
 
 # import some structures
 from base_objs import Range
@@ -13,13 +14,15 @@ from base_objs import Range
 MAX_COUNTER_VALUE = 20
 
 # accuracy
-EPS     = 1e-2
-
-# equation function
-FUNC    = lambda x : x**5 + 2*x - 8
+EPS      = 1e-1
+EPS_SPEC = 1e-3
 
 # root search range
-RANGE   = Range(1, 2)
+RANGE   = Range(0.1, 10)
+
+# equation function
+FUNC       = lambda x : x + np.log10(x) - 0.5
+FUNC_DERIV = lambda x : 1 + 1 / (log(10)*x)
 
 # iteration function (for basic iter meth)
-PHI     = lambda x : exp( -x/2 )
+PHI        = lambda x : 0.5 - np.log10(x)
