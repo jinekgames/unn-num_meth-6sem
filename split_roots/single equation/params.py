@@ -10,9 +10,6 @@ from base_objs import Range
 
 
 
-# max iterations count
-MAX_COUNTER_VALUE = 20
-
 # accuracy
 EPS      = 1e-1
 EPS_SPEC = 1e-3
