@@ -25,33 +25,37 @@ def main():
     Looking for root vector with Basic Iteration method
     """
 
-    #try:
+    try:
 
-    x = BasicIter(FUNC, PHI, X0, EPS, MAX_COUNTER_VALUE)
+        x = BasicIter(FUNC, PHI, X0, EPS, MAX_COUNTER_VALUE)
 
-    print(
-        "\nRoot was successfully found:\n",
-        "x    = ", x, " +- ", EPS, "\n",
-        "f(x) = ", CalculateVectorFunction(FUNC, x), "\n\n",
-        sep=""
-    )
+        print(
+            "\nRoot was successfully found:\n",
+            "x    = ", x, " +- ", EPS, "\n",
+            "f(x) = ", CalculateVectorFunction(FUNC, x), "\n\n",
+            sep=""
+        )
 
-    #except BaseException:
-    #    print(TextException())
+    except BaseException:
+        print(TextException())
 
 
     """
     Now Newtone method
     """
 
-    x = Newtone(func, X0, EPS)
+    try:
 
-    print(
-        "\nRoot was successfully found:\n",
-        "x    = ", x, " +- ", EPS, "\n\n",
-        sep=""
-    )
+        x = Newtone(func, X0, EPS)
 
+        print(
+            "\nRoot was successfully found:\n",
+            "x    = ", x, " +- ", EPS, "\n\n",
+            sep=""
+        )
+
+    except BaseException:
+        print(TextException())
 
 
 if __name__ == "__main__":

@@ -1,0 +1,1 @@
+here u can solve non linear equations or there systems using Bisection, Basic Iteration and Newtone or smth, idr, methods and also see the sample in main.py

@@ -1,0 +1,1 @@
+solving system of differential 3-dimensional equations with Runge-Kutta method (2, 3 and 4 -order)

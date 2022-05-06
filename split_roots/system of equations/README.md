@@ -1,0 +1,1 @@
+here u can solve system of non linear equations. see the sample in main.py
