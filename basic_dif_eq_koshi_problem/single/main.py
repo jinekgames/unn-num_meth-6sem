@@ -84,7 +84,6 @@ def main():
 
     # check if data is correct
     assert RANGE.end > RANGE.start,   "Incorrect RANGE (end < start)"
-    assert len(FUNC) == len(X0) - 1,  "Incorrect problem vectors (count of function != size of Koshi task)"
 
 
     step = (RANGE.end - RANGE.start) / SEGMENTS_COUNT
@@ -144,19 +143,16 @@ def main():
 
     # SciPy solution
     try:
-        
+
         print("\n\nSolving using SciPy")
-        def _f4sp(y: list, x: float) -> list:
-            return [
-                FUNC[0]([ x, y[0], y[1] ]),
-                FUNC[1]([ x, y[0], y[1] ]),
-            ]
+        def _f4sp(y: float, x: float) -> float:
+            return FUNC([ x, y ])
         _x4sp = np.linspace(RANGE.start, RANGE.end, SEGMENTS_COUNT+1)
-        _x_sp = odeint(_f4sp, X0[1:], _x4sp)
+        _x_sp = odeint(_f4sp, X0[1], _x4sp)
 
         x_sp = []
         for i in range(len(_x4sp)):
-            x_sp.append([ _x4sp[i], _x_sp[i][0], _x_sp[i][1] ])
+            x_sp.append([ _x4sp[i], _x_sp[i] ])
 
     except BaseException:
         print(TextException())
