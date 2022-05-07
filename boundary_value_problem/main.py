@@ -10,6 +10,9 @@ import numpy as np
 import scipy as sp
 import scipy.linalg as lalg
 
+import matplotlib.pyplot as plot
+import matplotlib.patches as patches
+
 
 
 def main():
@@ -80,10 +83,43 @@ And now we will get matrix of so m matrix which hmm we need the matrix ...    ok
         j, k = ( i % (n - 2) + 1,  int(i / (n - 2)) + 1 )
         final[k][j] = x[i]
 
-    print()
+    print("Solved grid of temperatures")
     print(final)
 
 
+    """
+    Lets see in graph
+    """
+
+    try:
+
+        # for colours
+        temp_max   = final.max()
+        temp_min   = final.min()
+        temp_delta = temp_max - temp_min
+
+        fig, ax = plot.subplots()
+        ax.plot([rect.left, rect.right + h],[rect.bottom, rect.top + l])
+
+        for k in range(n):
+            for j in range(n):
+
+                theColor = (0,0,0, (temp_max - final[k][j]) / temp_delta * 0.9 + 0.1)
+
+                ax.add_patch(
+                    patches.Rectangle(
+                        (j * h, k * l),
+                        h,
+                        l,
+                        facecolor = theColor,
+                        fill=True
+                    ) )
+
+        plot.show()
+
+    except BaseException:
+        print("\n!!! PLOT ERROR\n")
+        print(TextException())
 
 
 
