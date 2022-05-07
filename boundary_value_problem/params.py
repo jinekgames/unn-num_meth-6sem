@@ -17,8 +17,8 @@ rect = RECT_DOUBLE(_A, _D, _B, _C)
 
 
 # x and y step
-h = 1/4
-l = 1/4
+h = 1/16
+l = h
 
 
 # edge conditions

@@ -99,7 +99,6 @@ And now we will get matrix of so m matrix which hmm we need the matrix ...    ok
         temp_delta = temp_max - temp_min
 
         fig, ax = plot.subplots()
-        ax.plot([rect.left, rect.right + h],[rect.bottom, rect.top + l])
 
         for k in range(n):
             for j in range(n):
