@@ -13,6 +13,8 @@ import scipy.linalg as lalg
 import matplotlib.pyplot as plot
 import matplotlib.patches as patches
 
+import time
+
 
 
 def main():
@@ -21,13 +23,16 @@ def main():
 Solve the problem using our method
     """
 
+    start_time = time.time()
     x = BoundValPuassonRectEq(f, rect, conds, h, l)
+    end_time   = time.time()
+
+    print("Calculation was done in", round(end_time - start_time, 3), "seconds\n")
 
     """
 Exact solution
     """
     n = int( (rect.right - rect.left) / h ) + 1
-    print(n)
     i_max = (n - 2) ** 2
     ex_x = np.zeros(i_max)
     for i in range(i_max):

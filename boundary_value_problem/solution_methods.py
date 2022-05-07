@@ -9,7 +9,7 @@ from base_objs import *
 
 
 
-DEBUG = TRUE
+DEBUG = FALSE
 
 MAX_ITERATIONS_COUNT = 52
 
@@ -154,7 +154,7 @@ def BoundValPuassonRectEq(f: lambda_type, rect: RECT_DOUBLE, conds: RECT_FUNC, x
          array
         the array with counted values on points of our grid inside the rect
         they are numbered from 0 to i_max and does upside down according to the picture, from left to right
-hl
+
     """         
 
 
