@@ -132,18 +132,23 @@ And now we will get matrix of so m matrix which hmm we need the matrix ...    ok
         fig, ax = plot.subplots()
         ax.set_xlim([rect.left, rect.left + n*h])
         ax.set_ylim([rect.bottom, rect.bottom + m*l])
+        x_ax_segment = cond_value((h < 1/10), 1/10, h)
+        y_ax_segment = cond_value((l < 1/10), 1/10, l)
+        ax.xaxis.set_major_locator(ticker.MultipleLocator(x_ax_segment))
+        ax.yaxis.set_major_locator(ticker.MultipleLocator(y_ax_segment))
 
         for k in range(m):
             for j in range(n):
 
-                theColor = (0,0,0, (temp_max - final[k][j]) / temp_delta * 0.9 + 0.1)
+                gradient = (temp_max - final[k][j]) / temp_delta
+                theColor = (1 - gradient, 0, gradient)
 
                 ax.add_patch(
                     patches.Rectangle(
                         (j * h + rect.left, k * l + rect.bottom),
                         h, l,
                         facecolor = theColor,
-                        fill=True
+                        fill = TRUE
                     ))
 
         plot.show()

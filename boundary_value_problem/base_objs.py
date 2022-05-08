@@ -165,3 +165,8 @@ def MaxDelNP(v1, v2):
     the same as previous but optimized for np calculations
     """
     return np.fabs(v1 - v2).max()
+
+def cond_value(condition: bool, true_value, false_value):
+    if (condition):
+        return true_value
+    return false_value
