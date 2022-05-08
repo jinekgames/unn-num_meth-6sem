@@ -4,6 +4,8 @@ here r some function whick solve some math tasks
 
 
 import numpy as np
+import scipy.linalg as lalg
+from sympy import solve
 
 from base_objs import *
 
@@ -11,7 +13,7 @@ from base_objs import *
 
 DEBUG = TRUE
 
-MAX_ITERATIONS_COUNT = 52
+MAX_ITERATIONS_COUNT = 1e3
 
 
 
@@ -104,6 +106,11 @@ def LinAlgRelax(x: list, a: list, b: list = 0, accuracy: float = 1e-5, w: float 
 
     n = len(x)
 
+    if (DEBUG):
+        # get exact solutuon using SciPy
+        sp_x = lalg.solve(a, b.reshape((n, 1)))
+        print("LinAlg solution")
+
     if (not len(b)):
         b = np.zeros(n)
 
@@ -115,19 +122,25 @@ def LinAlgRelax(x: list, a: list, b: list = 0, accuracy: float = 1e-5, w: float 
 
     counter = 0
     while TRUE:   # many iterations for potryasayushaya accuracy
+        # print(x_prev)    # ULTA SUPER MEGA DEBUG
         x_next = LinAlgRelaxIter(x_prev, a, b, w, n)
         if (VectorsMaxDelta(x_next, x_prev) < accuracy):
             if (DEBUG):
                 print("Lin eq sys accuracy:", accuracy)
+                print(counter + 1, "iterations done")
+                print("Delta to scipy solution:", VectorsMaxDelta(sp_x, x_next))
             return RoundByAccurVec(x_next, accuracy)
         if (counter >= MAX_ITERATIONS_COUNT):
             if (DEBUG):
-                print("Lin eq sys accuracy:", x_next - x_prev)
+                print("Lin eq sys accuracy (user accuracy was not archived):", VectorsMaxDelta(sp_x, x_next))
+                print(counter + 1, "iterations done")
+                print("Delta to scipy solution:", VectorsMaxDelta(sp_x, x_next))
             return RoundByAccurVec(x_next, x_next - x_prev)
         x_prev = x_next
+        counter += 1
 
 
-def BoundValPuassonRectEq(f: lambda_type, rect: RECT_DOUBLE, conds: RECT_FUNC, x_step: float, y_step = 0) -> list:
+def BoundValPuassonRectEq(f: lambda_type, rect: RECT_DOUBLE, conds: RECT_FUNC, x_step: float, y_step = 0, accuracy = 1e-5) -> list:
 
     """
     This function can calculate Puasson equation using numerical grid method
@@ -135,23 +148,24 @@ def BoundValPuassonRectEq(f: lambda_type, rect: RECT_DOUBLE, conds: RECT_FUNC, x
 
     Arguements:
 
-         f:       lambda
-        function in right side of Puasson eq.
-                                             
-         rect:    RECT of floats             
-        this value shows edges of area       
-                                                          
-         conds:   RECT of lambdas
+         f:        lambda
+        function in right side of Puasson eq.            left  right  
+                                                           +——————— >  X
+         rect:     RECT of floats                   bottom | ┌─┐
+        this value shows edges of area                 top | └─┘RECT
+                                                        Y  V             // carthesian system is computer like (OY goes down)  
+         conds:    RECT of lambdas                       
         conditions on the rect edges
 
-         x_step:  float
+         x_step:   float
         size of grid on Ox
 
-         y_step:  float
+         y_step:   float
         size of grid on Oy
         if was not set then = x_step
 
-        x_step and y_step must be such that we'll have the same count of segments on Oy and Ox axis
+         accuracy: float
+        accuracy of lin alg calculations
 
     Return:
 
@@ -162,7 +176,7 @@ def BoundValPuassonRectEq(f: lambda_type, rect: RECT_DOUBLE, conds: RECT_FUNC, x
     """         
 
 
-    # check edges and steps
+    # check edges and steps    TODO: mb delete
     assert int((rect.right - rect.left) / x_step) == ((rect.right - rect.left) / x_step),  "incorrect x_step"
     assert int((rect.top - rect.bottom) / y_step) == ((rect.top - rect.bottom) / y_step),  "incorrect y_step"
 
@@ -171,14 +185,13 @@ def BoundValPuassonRectEq(f: lambda_type, rect: RECT_DOUBLE, conds: RECT_FUNC, x
     m = int( (rect.top - rect.bottom) / y_step ) + 1
     i_max = (n - 2) * (m - 2)
     if (DEBUG):
-        print("\n\nBoundValPuassonRectEq_DEBUG\nn =", n, " m =", m, " i_max =", i_max, end="\n\n")
-    # assert (n == m),  "incorrect grid"
+        print("\n\nBoundValPuassonRectEq_DEBUG\nn =", n, " m =", m, " i_max =", i_max, "\nx_step = ", x_step, "\ny_step = ", y_step, end="\n")
 
     # macros to calculate one coords from another
-    j2x  =  lambda j :     j * x_step
-    k2y  =  lambda k :     k * y_step
-    kj2i =  lambda k, j : (k - 1) * (n - 2) + j
-    i2jk =  lambda i:    ( i % (n - 2) + 1,  int(i / (n - 2)) + 1 )
+    j2x  =  lambda j     :  j * x_step + rect.left
+    k2y  =  lambda k     :  k * y_step + rect.bottom
+    kj2i =  lambda k, j  :  (k - 1) * (n - 2) + j - 1
+    i2jk =  lambda i     :  ( i % (n - 2) + 1,  int(i / (n - 2)) + 1 )
 
     # define matrix of lin eq sys
     matr = np.zeros((i_max, i_max))
@@ -199,27 +212,27 @@ def BoundValPuassonRectEq(f: lambda_type, rect: RECT_DOUBLE, conds: RECT_FUNC, x
 
         # u_j+1_k
         if (j + 1 == n - 1):
-            rvec[i] -= conds.right([j2x(j), k2y(k)]) * 1/x_step**2
+            rvec[i] -= conds.right([j2x(j + 1), k2y(k)]) / x_step**2
         else:
-            matr[i][i+1] = 1 / x_step**2
+            matr[i][kj2i(k, j+1)] = 1 / x_step**2
 
         # u_j-1_k
         if (j - 1 == 0):
-            rvec[i] -= conds.bottom([j2x(j), k2y(k)]) * 1/x_step**2
+            rvec[i] -= conds.left([j2x(j - 1), k2y(k)]) / x_step**2
         else:
-            matr[i][i-1] = 1 / x_step**2
+            matr[i][kj2i(k, j-1)] = 1 / x_step**2
 
         # u_j_k+1
         if (k + 1 == m - 1):
-            rvec[i] -= conds.top([j2x(j), k2y(k)]) * 1/y_step**2
+            rvec[i] -= conds.top([j2x(j), k2y(k + 1)]) / y_step**2
         else:
-            matr[i][i + (n-2)] = 1 / y_step**2
+            matr[i][kj2i(k+1, j)] = 1 / y_step**2
 
         # u_j_k-1
         if (k - 1 == 0):
-            rvec[i] -= conds.left([j2x(j), k2y(k)]) * 1/y_step**2
+            rvec[i] -= conds.bottom([j2x(j), k2y(k - 1)]) / y_step**2
         else:
-            matr[i][i - (n-2)] = 1 / y_step**2
+            matr[i][kj2i(k-1, j)] = 1 / y_step**2
 
 
     # print the matrix
@@ -248,15 +261,16 @@ def BoundValPuassonRectEq(f: lambda_type, rect: RECT_DOUBLE, conds: RECT_FUNC, x
             f.write(_debug_str)
         except BaseException:
             TextException()
-            print("DEBUG ERROR")
+            print("FILE DEBUG ERROR")
         finally:
             f.close()
+        print()
 
 
     """
     Solve the system
     """
     x = np.array([1 for i in range(i_max)])
-    x = LinAlgRelax(x, matr, rvec, 1e-6, 0.9)
+    x = LinAlgRelax(x, matr, rvec, accuracy, 0.9)
 
     return x

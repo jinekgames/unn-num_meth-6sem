@@ -28,7 +28,7 @@ Solve the problem using our method
     x = BoundValPuassonRectEq(f, rect, conds, h, l)
     end_time   = time.time()
 
-    print("Calculation was done in", round(end_time - start_time, 3), "seconds\n")
+    print("\n\nCalculations were done in", round(end_time - start_time, 3), "seconds\n")
 
     """
 Exact solution
@@ -39,7 +39,7 @@ Exact solution
     ex_x = np.zeros(i_max)
     for i in range(i_max):
         j, k = ( i % (n - 2) + 1,  int(i / (n - 2)) + 1 )
-        ex_x[i] = ex_sol([j * h, k * l])
+        ex_x[i] = ex_sol([j * h + rect.left, k * l + rect.bottom])
 
     print("\n\n\
 Lets look at the solutions\
@@ -78,13 +78,13 @@ And now we will get matrix of so m matrix which hmm we need the matrix ...    ok
     # fill edge conditions
 
     for j in range(n):
-        final[0][j]     = conds.left([j * h, rect.bottom])
+        final[0][j]     = conds.bottom([j * h + rect.left, rect.bottom])
     for k in range(m):
-        final[k][0]     = conds.bottom([rect.left, k * l])
+        final[k][0]     = conds.left([rect.left, k * l + rect.bottom])
     for j in range(n):
-        final[m - 1][j] = conds.top([j * h, rect.top])
+        final[m - 1][j] = conds.top([j * h + rect.left, rect.top])
     for k in range(m):
-        final[k][n - 1] = conds.right([rect.right, k * l])
+        final[k][n - 1] = conds.right([rect.right, k * l + rect.bottom])
 
     # fill our solution
 
@@ -121,9 +121,8 @@ And now we will get matrix of so m matrix which hmm we need the matrix ...    ok
         temp_delta = temp_max - temp_min
 
         fig, ax = plot.subplots()
-
-        ax.xaxis.set_major_locator(ticker.MultipleLocator(h))
-        ax.yaxis.set_major_locator(ticker.MultipleLocator(l))
+        ax.set_xlim([rect.left, rect.left + n*h])
+        ax.set_ylim([rect.bottom, rect.bottom + m*l])
 
         for k in range(m):
             for j in range(n):
@@ -132,12 +131,11 @@ And now we will get matrix of so m matrix which hmm we need the matrix ...    ok
 
                 ax.add_patch(
                     patches.Rectangle(
-                        (j * h, k * l),
-                        h,
-                        l,
+                        (j * h + rect.left, k * l + rect.bottom),
+                        h, l,
                         facecolor = theColor,
                         fill=True
-                    ) )
+                    ))
 
         plot.show()
 
