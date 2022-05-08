@@ -3,6 +3,8 @@ here r some function whick solve some math tasks
 """
 
 
+from numba import jit
+
 import numpy as np
 import scipy.linalg as lalg
 from sympy import solve
@@ -11,12 +13,14 @@ from base_objs import *
 
 
 
-DEBUG = TRUE
+# ! disable debug if calculations are really big for optimisation
+DEBUG = FALSE
 
 MAX_ITERATIONS_COUNT = 1e3
 
 
 
+@jit
 def LinAlgRelaxIter(x: list, a: list, b: list, w: float, n: float) -> list:
 
     """
@@ -70,6 +74,7 @@ def LinAlgRelaxIter(x: list, a: list, b: list, w: float, n: float) -> list:
     return sol
 
 
+@jit
 def LinAlgRelax(x: list, a: list, b: list = 0, accuracy: float = 1e-5, w: float = 1) -> list:
 
     """
@@ -107,8 +112,6 @@ def LinAlgRelax(x: list, a: list, b: list = 0, accuracy: float = 1e-5, w: float 
     n = len(x)
 
     if (DEBUG):
-        # get exact solutuon using SciPy
-        sp_x = lalg.solve(a, b.reshape((n, 1)))
         print("LinAlg solution")
 
     if (not len(b)):
@@ -124,20 +127,19 @@ def LinAlgRelax(x: list, a: list, b: list = 0, accuracy: float = 1e-5, w: float 
     while TRUE:   # many iterations for potryasayushaya accuracy
         # print(x_prev)    # ULTA SUPER MEGA DEBUG
         x_next = LinAlgRelaxIter(x_prev, a, b, w, n)
-        if (VectorsMaxDelta(x_next, x_prev) < accuracy):
+        if (MaxDelNP(x_next, x_prev) < accuracy):
             if (DEBUG):
                 print("Lin eq sys accuracy:", accuracy)
                 print(counter + 1, "iterations done")
-                print("Delta to scipy solution:", VectorsMaxDelta(sp_x, x_next))
-            return RoundByAccurVec(x_next, accuracy)
+            return x_next
         if (counter >= MAX_ITERATIONS_COUNT):
             if (DEBUG):
-                print("Lin eq sys accuracy (user accuracy was not archived):", VectorsMaxDelta(sp_x, x_next))
+                print("Lin eq sys accuracy (user accuracy was not archived):", MaxDelNP(x_next, x_prev))
                 print(counter + 1, "iterations done")
-                print("Delta to scipy solution:", VectorsMaxDelta(sp_x, x_next))
-            return RoundByAccurVec(x_next, x_next - x_prev)
+            return x_next
         x_prev = x_next
         counter += 1
+
 
 
 def BoundValPuassonRectEq(f: lambda_type, rect: RECT_DOUBLE, conds: RECT_FUNC, x_step: float, y_step = 0, accuracy = 1e-5) -> list:
@@ -270,7 +272,7 @@ def BoundValPuassonRectEq(f: lambda_type, rect: RECT_DOUBLE, conds: RECT_FUNC, x
     """
     Solve the system
     """
-    x = np.array([1 for i in range(i_max)])
+    x = np.array([1.0 for i in range(i_max)])
     x = LinAlgRelax(x, matr, rvec, accuracy, 0.9)
 
     return x

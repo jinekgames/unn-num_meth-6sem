@@ -10,6 +10,7 @@ import ctypes
 
 import sys
 import linecache
+from numba import jit
 
 
 TRUE  = 1
@@ -127,7 +128,6 @@ def RoundByAccurVec(x: list, accuracy: float) -> list:
     return t
 
 
-
 def CalculateVectorFunction(f: list, x: list) -> list:
     """
     Calculates value of vector function in some vector point
@@ -147,6 +147,8 @@ def VectorMax(v: list):
 def VectorsMaxDelta(v1: list, v2: list):
     """
     Calculates deltas by every axis and returns the max of them
+    
+    ! length og arguements should be the same
     """
     if len(v1) != len(v2):
         raise "Incorrect arguements"
@@ -156,3 +158,10 @@ def VectorsMaxDelta(v1: list, v2: list):
         deltas.append(fabs(v2[i] - v1[i]))
     
     return VectorMax(deltas)
+
+@jit
+def MaxDelNP(v1, v2):
+    """
+    the same as previous but optimized for np calculations
+    """
+    return np.fabs(v1 - v2).max()

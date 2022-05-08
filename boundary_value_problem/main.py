@@ -14,7 +14,9 @@ import matplotlib.pyplot as plot
 import matplotlib.patches as patches
 import matplotlib.ticker as ticker
 
-import time
+
+import ctypes
+lib = ctypes.windll.kernel32
 
 
 
@@ -23,12 +25,14 @@ def main():
     """
 Solve the problem using our method
     """
+    
+    print("Calculations started...")
 
-    start_time = time.time()
-    x = BoundValPuassonRectEq(f, rect, conds, h, l)
-    end_time   = time.time()
+    start_time = lib.GetTickCount64()
+    x = BoundValPuassonRectEq(f, rect, conds, h, l, accuracy = accuracy)
+    end_time   = lib.GetTickCount64()
 
-    print("\n\nCalculations were done in", round(end_time - start_time, 3), "seconds\n")
+    print("\n\nCalculations were done in", (end_time - start_time) / 1000, "seconds\n")
 
     """
 Exact solution
@@ -53,15 +57,20 @@ Lets look at the solutions\
         "Exact".center(table_col_width),
         sep=" │ ", end=" │\n"
     )
-    for i in range(i_max):
+    index = 0
+    while (index < i_max):
         print("├────┼─", end="")
         print("─"*table_col_width, "─"*table_col_width, sep="─┼─", end="─┤\n")
         print(
-            "│" + str(i + 1).rjust(3),
-            str(round(x[i],       table_col_width - 3)).center(table_col_width),
-            str(round(ex_x[i],    table_col_width - 3)).center(table_col_width),
+            "│" + str(index + 1).rjust(3),
+            str(round(x[index],       table_col_width - 3)).center(table_col_width),
+            str(round(ex_x[index],    table_col_width - 3)).center(table_col_width),
             sep=" │ ", end=" │\n"
         )
+        index += 1
+        if (i_max > 50 and index == 26):
+            print("\n    ...\n")
+            index = i_max - 25
     print("└────┴─", end="")
     print("─"*table_col_width, "─"*table_col_width, sep="─┴─", end="─┘\n")
 
