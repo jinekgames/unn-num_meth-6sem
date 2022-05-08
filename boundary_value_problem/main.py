@@ -12,6 +12,7 @@ import scipy.linalg as lalg
 
 import matplotlib.pyplot as plot
 import matplotlib.patches as patches
+import matplotlib.ticker as ticker
 
 import time
 
@@ -33,7 +34,8 @@ Solve the problem using our method
 Exact solution
     """
     n = int( (rect.right - rect.left) / h ) + 1
-    i_max = (n - 2) ** 2
+    m = int( (rect.top - rect.bottom) / l ) + 1
+    i_max = (n - 2) * (m - 2)
     ex_x = np.zeros(i_max)
     for i in range(i_max):
         j, k = ( i % (n - 2) + 1,  int(i / (n - 2)) + 1 )
@@ -55,7 +57,7 @@ Lets look at the solutions\
         print("├────┼─", end="")
         print("─"*table_col_width, "─"*table_col_width, sep="─┼─", end="─┤\n")
         print(
-            "│" + str(i).rjust(3),
+            "│" + str(i + 1).rjust(3),
             str(round(x[i],       table_col_width - 3)).center(table_col_width),
             str(round(ex_x[i],    table_col_width - 3)).center(table_col_width),
             sep=" │ ", end=" │\n"
@@ -63,23 +65,25 @@ Lets look at the solutions\
     print("└────┴─", end="")
     print("─"*table_col_width, "─"*table_col_width, sep="─┴─", end="─┘\n")
 
+    print("Final accuracy:", VectorsMaxDelta(x, ex_x), "\n")
+
 
 
     """
 And now we will get matrix of so m matrix which hmm we need the matrix ...    ok?
     """
 
-    final = np.zeros((n, n))
+    final = np.zeros((m, n))
 
     # fill edge conditions
 
     for j in range(n):
         final[0][j]     = conds.left([j * h, rect.bottom])
-    for k in range(n):
+    for k in range(m):
         final[k][0]     = conds.bottom([rect.left, k * l])
     for j in range(n):
-        final[n - 1][j] = conds.top([j * h, rect.top])
-    for k in range(n):
+        final[m - 1][j] = conds.top([j * h, rect.top])
+    for k in range(m):
         final[k][n - 1] = conds.right([rect.right, k * l])
 
     # fill our solution
@@ -88,8 +92,21 @@ And now we will get matrix of so m matrix which hmm we need the matrix ...    ok
         j, k = ( i % (n - 2) + 1,  int(i / (n - 2)) + 1 )
         final[k][j] = x[i]
 
-    print("Solved grid of temperatures")
-    print(final)
+    print("\nSolved grid of temperatures")
+
+    table_col_width = 6
+    table_col_count = n
+    print("┌─", ("─"*table_col_width + "─┬─")*(table_col_count-1), "─"*table_col_width + "─┐", sep="")
+    for k in range(m):
+        if (k > 0):
+            print("├─", ("─"*table_col_width + "─┼─")*(table_col_count-1), "─"*table_col_width + "─┤", sep="")
+        print("│", end="")
+        for el in final[k]:
+            print(str(round(el, table_col_width - 2)).center(table_col_width + 2), "│", sep="", end = "")
+        print()
+    print("└─", ("─"*table_col_width + "─┴─")*(table_col_count-1), "─"*table_col_width + "─┘", sep="")
+
+
 
 
     """
@@ -105,7 +122,10 @@ And now we will get matrix of so m matrix which hmm we need the matrix ...    ok
 
         fig, ax = plot.subplots()
 
-        for k in range(n):
+        ax.xaxis.set_major_locator(ticker.MultipleLocator(h))
+        ax.yaxis.set_major_locator(ticker.MultipleLocator(l))
+
+        for k in range(m):
             for j in range(n):
 
                 theColor = (0,0,0, (temp_max - final[k][j]) / temp_delta * 0.9 + 0.1)

@@ -7,18 +7,18 @@ from base_objs import *
 import numpy as np
 
 
-# rect edges            a b    
-_A = 0      #         +——————— >  X
-_B = 1      #       c | ┌─┐
-_C = 0      #       d | └─┘
-_D = 1      #      Y  V        // carthesian system is computer like (OY goes down)
+# rect edges
+_A = 0      
+_B = 1      
+_C = 0      
+_D = 1      
 
 rect = RECT_DOUBLE(_A, _D, _B, _C)
 
 
 # x and y step
-h = 1/20
-l = h
+h = 1/4
+l = 1/4
 
 
 # edge conditions

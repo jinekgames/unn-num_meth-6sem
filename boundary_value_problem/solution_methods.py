@@ -9,7 +9,7 @@ from base_objs import *
 
 
 
-DEBUG = FALSE
+DEBUG = TRUE
 
 MAX_ITERATIONS_COUNT = 52
 
@@ -117,8 +117,12 @@ def LinAlgRelax(x: list, a: list, b: list = 0, accuracy: float = 1e-5, w: float 
     while TRUE:   # many iterations for potryasayushaya accuracy
         x_next = LinAlgRelaxIter(x_prev, a, b, w, n)
         if (VectorsMaxDelta(x_next, x_prev) < accuracy):
+            if (DEBUG):
+                print("Lin eq sys accuracy:", accuracy)
             return RoundByAccurVec(x_next, accuracy)
         if (counter >= MAX_ITERATIONS_COUNT):
+            if (DEBUG):
+                print("Lin eq sys accuracy:", x_next - x_prev)
             return RoundByAccurVec(x_next, x_next - x_prev)
         x_prev = x_next
 
@@ -127,16 +131,16 @@ def BoundValPuassonRectEq(f: lambda_type, rect: RECT_DOUBLE, conds: RECT_FUNC, x
 
     """
     This function can calculate Puasson equation using numerical grid method
-    Linear alg system is being calculated using LowRelaxation methon (TODO: not optimized)
+    Linear alg system is being calculated using LowRelaxation methon (TODO: add optimal w calculation)
 
     Arguements:
 
          f:       lambda
-        function in right side of Puasson eq.                left  right  
-                                                               +——————— >  X
-         rect:    RECT of floats                        bottom | ┌─┐
-        this value shows edges of area                     top | └─┘
-                                                            Y  V        // carthesian system is computer like (OY goes down)             
+        function in right side of Puasson eq.
+                                             
+         rect:    RECT of floats             
+        this value shows edges of area       
+                                                          
          conds:   RECT of lambdas
         conditions on the rect edges
 
@@ -166,8 +170,9 @@ def BoundValPuassonRectEq(f: lambda_type, rect: RECT_DOUBLE, conds: RECT_FUNC, x
     n = int( (rect.right - rect.left) / x_step ) + 1
     m = int( (rect.top - rect.bottom) / y_step ) + 1
     i_max = (n - 2) * (m - 2)
-    print("n =", n, "m =", m, "i_max =", i_max, end="\n\n")
-    assert (n == m),  "incorrect grid"
+    if (DEBUG):
+        print("\n\nBoundValPuassonRectEq_DEBUG\nn =", n, " m =", m, " i_max =", i_max, end="\n\n")
+    # assert (n == m),  "incorrect grid"
 
     # macros to calculate one coords from another
     j2x  =  lambda j :     j * x_step
@@ -219,14 +224,33 @@ def BoundValPuassonRectEq(f: lambda_type, rect: RECT_DOUBLE, conds: RECT_FUNC, x
 
     # print the matrix
     if (DEBUG):
-        print("\nThe matrix of linear equation system:\n")
+        _debug_str = ""
+        _debug_str += "\nThe matrix of linear equation system:\n\n"
+        table_col_size = GetIntDigitsCount(matr[0][0]) + 3
+        _debug_str += " "*table_col_size
+        for j in range(i_max):
+            _debug_str += str(j + 1).center(table_col_size)
+        _debug_str += "\n"
         for k in range(i_max):
+            _debug_str += str(k + 1).center(table_col_size)
             for j in range(i_max):
                 if(matr[k][j]):
-                    print(str(round(matr[k][j], 2)).rjust(6), end="")
+                    _debug_str += str(round(matr[k][j], 2)).rjust(table_col_size)
                 else:
-                    print(" "*6, end="")
-            print(" |", str(round(rvec[k], 2)).rjust(6), sep="")
+                    _debug_str += " "*table_col_size
+            _debug_str += " |" + str(round(rvec[k], 2)).rjust(table_col_size) + "\n"
+        if (i_max < 20):
+            print(_debug_str)
+        else:
+            print("Lin System matrix u can see in the file \"eq sys matr.txt\"\n")
+        f = open("eq sys matr.txt", "w")
+        try:
+            f.write(_debug_str)
+        except BaseException:
+            TextException()
+            print("DEBUG ERROR")
+        finally:
+            f.close()
 
 
     """
