@@ -164,3 +164,9 @@ cython_debug/
 # debug files of da project
 eq sys matr.txt
 another_params/
+
+# other
+.vscode/
+
+# vs
+*.pyproj
