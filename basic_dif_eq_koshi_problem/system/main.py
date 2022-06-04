@@ -17,7 +17,7 @@ PLOT_DEBUG_POINTS        = FALSE
 PLOT_GRID_XLINESSS_COUNT = 20
 PLOT_MARKER_SIZE         = 6
 
-def ShowSolutionsPlots(x: list, title = str, x_offset_start=0., x_offset_end=0):
+def ShowSolutionsPlots(x: list, title: str, labels: list = False):
 
     """
     Show plot of your solutions
@@ -32,10 +32,27 @@ def ShowSolutionsPlots(x: list, title = str, x_offset_start=0., x_offset_end=0):
     # colors for different plots (if TURN_ON_THE_COLORS is TRUE)
     colors_for_plot = [
         "red",
-        "yellow",
+        "blue",
         "green",
         "purple"
     ]
+
+
+
+    # restructure vectors of dots from [ [x1, y1], ... ] to [x1, ...], [y1, ...]
+
+    x_new = []
+
+    for i in range(len(x)):
+
+        x_step = [[], []]
+
+        for k in range(len(x[i])):
+            x_step[0].append(x[i][k][0])
+            x_step[1].append(x[i][k][1])
+
+        x_new.append(x_step)
+
 
 
     try:
@@ -44,8 +61,8 @@ def ShowSolutionsPlots(x: list, title = str, x_offset_start=0., x_offset_end=0):
 
         fig.set_size_inches(13, 9) 
 
-        range_start = x[0][0][0] + x_offset_start
-        range_end   = x[0][len(x[0])-1][0] - x_offset_end
+        range_start = x[0][0][0]
+        range_end   = x[0][len(x[0])-1][0]
         grid_sizze  = (range_end - range_start) / PLOT_GRID_XLINESSS_COUNT
         ax.set_xticks(np.arange( range_start,  range_end + grid_sizze, grid_sizze))
         ax.grid(color='black', linewidth=0.5, linestyle='--')
@@ -61,15 +78,14 @@ def ShowSolutionsPlots(x: list, title = str, x_offset_start=0., x_offset_end=0):
             else:
                 theColor = (0,0,0, 1 / len(x) * (i+1) )
 
-            for k in range(len(x[i])):
-                if (x[i][k][0] >= range_start - grid_sizze and x[i][k][0] <= range_end + grid_sizze):
-                    ax.plot(x[i][k][0], x[i][k][1], color=theColor, marker='o', markersize=PLOT_MARKER_SIZE)  # draw every k point of i solution (0 is x, 1 is y)
-                    if(PLOT_DEBUG_POINTS):
-                        print(x[i][k])
+            line, = ax.plot(x_new[i][0], x_new[i][1], color=theColor, marker='o', markersize=PLOT_MARKER_SIZE)
+            if (labels):
+                line.set_label(labels[i])
 
 
         plt.title(title)
         fig.canvas.manager.set_window_title("Solution of differetintial equations' system")
+        ax.legend(labels)
 
         plt.show()
 
@@ -101,7 +117,7 @@ def main():
         x2_2 = RungeKutta2(FUNC, X0, step/2, SEGMENTS_COUNT*2)
         x4_2 = RungeKutta2(FUNC, X0, step/4, SEGMENTS_COUNT*4)
         x8_2 = RungeKutta2(FUNC, X0, step/8, SEGMENTS_COUNT*8)
-        ShowSolutionsPlots([x_2, x2_2, x4_2, x8_2], "Runge-Kutta 2-order method")
+        ShowSolutionsPlots([x_2, x2_2, x4_2, x8_2], "Runge-Kutta 2-order method", ["full step", "half step", "quarter step", "1/8 step"])
 
     except BaseException:
         print(TextException())
@@ -118,7 +134,7 @@ def main():
         x2_3 = RungeKutta3(FUNC, X0, step/2, SEGMENTS_COUNT*2)
         x4_3 = RungeKutta3(FUNC, X0, step/4, SEGMENTS_COUNT*4)
         x8_3 = RungeKutta3(FUNC, X0, step/8, SEGMENTS_COUNT*8)
-        ShowSolutionsPlots([x_3, x2_3, x4_3, x8_3], "Runge-Kutta 3-order method")
+        ShowSolutionsPlots([x_3, x2_3, x4_3, x8_3], "Runge-Kutta 3-order method", ["full step", "half step", "quarter step", "1/8 step"])
 
     except BaseException:
         print(TextException())
@@ -135,7 +151,7 @@ def main():
         x2_4 = RungeKutta4(FUNC, X0, step/2, SEGMENTS_COUNT*2)
         x4_4 = RungeKutta4(FUNC, X0, step/4, SEGMENTS_COUNT*4)
         x8_4 = RungeKutta4(FUNC, X0, step/8, SEGMENTS_COUNT*8)
-        ShowSolutionsPlots([x_4, x2_4, x4_4, x8_4], "Runge-Kutta 4-order method")
+        ShowSolutionsPlots([x_4, x2_4, x4_4, x8_4], "Runge-Kutta 4-order method", ["full step", "half step", "quarter step", "1/8 step"])
 
     except BaseException:
         print(TextException())
@@ -169,7 +185,7 @@ def main():
     and also the scipy solution                                                                 \n\
     ")
 
-    ShowSolutionsPlots([x_2, x_3, x_4, x_sp], "Runge-Kutta 2+3+4-order methods (11 steps) and SciPy")
+    ShowSolutionsPlots([x_2, x_3, x_4, x_sp], "Runge-Kutta 2+3+4-order methods (11 steps) and SciPy", ["2-order method", "3-order method", "4-order method", "math library solution"])
 
 
 

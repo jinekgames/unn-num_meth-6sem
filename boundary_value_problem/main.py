@@ -4,7 +4,7 @@ The sample solution of Boundary value problem with Puasson equation
 
 from params import *
 from base_objs import *
-from solution_methods import *
+# from solution_methods import *
 
 import numpy as np
 import scipy as sp
@@ -13,6 +13,9 @@ import scipy.linalg as lalg
 import matplotlib.pyplot as plot
 import matplotlib.patches as patches
 import matplotlib.ticker as ticker
+
+from solution_methods import BoundValPuassonRectEq
+# from boundaryvalueproblem import BoundValPuassonRectEq    # from cpp lib
 
 
 import ctypes
@@ -29,7 +32,7 @@ Solve the problem using our method
     print("Calculations started...")
 
     start_time = lib.GetTickCount64()
-    x = BoundValPuassonRectEq(f, rect, conds, h, l, accuracy = accuracy)
+    x = BoundValPuassonRectEq(f, rect, conds, h, l, accuracy)
     end_time   = lib.GetTickCount64()
 
     print("\n\nCalculations were done in", (end_time - start_time) / 1000, "seconds\n")

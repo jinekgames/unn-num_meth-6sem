@@ -18,4 +18,3 @@ RANGE = Range(2, 3)
 X0 = [ 2, -np.log(2) ]      # x0, y0 = y(x0)
 
 SEGMENTS_COUNT = 10
-

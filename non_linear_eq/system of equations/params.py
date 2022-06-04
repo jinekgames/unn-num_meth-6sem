@@ -16,14 +16,14 @@ EPS     = 1e-4
 
 # equation functions vector
 FUNC    = [
-    lambda x :   np.cos(x[1] + 0.5) + x[0]   - 0.8 ,
-    lambda x :   np.sin(x[0])       - 2*x[1] - 1.6 ,
+    lambda x :   np.cos(x[1])     + 2 * x[0]   - 2   ,
+    lambda x :   np.cos(x[0] - 1) + x[1]       - 1.6 ,
 ]
 
 from solution_methods import Newtone, x, y
 func = [
-    sp.cos(y + 0.5) + x   - 0.8 ,
-    sp.sin(x)       - 2*y - 1.6 ,
+    sp.cos(y)     + 2 * x   - 2   ,
+    sp.cos(x - 1) + y       - 1.6 ,
 ]
 
 """
@@ -37,6 +37,6 @@ X0      = [ 100, 100, ]
 
 # iteration functions vector (for basic iter meth)
 PHI     = [
-    lambda x : 0.8 - np.cos(x[1] + 0.5)   ,
-    lambda x : (-1.6 + np.sin(x[0])) / 2  ,
+    lambda x : (-np.cos(x[1]) + 2) / 2   ,
+    lambda x : -np.cos(x[0] - 1) + 1.6  ,
 ]

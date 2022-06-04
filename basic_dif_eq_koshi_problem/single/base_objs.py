@@ -124,25 +124,3 @@ def VectorsMaxDelta(v1: list, v2: list):
         deltas.append(fabs(v2[i] - v1[i]))
     
     return VectorMax(deltas)
-
-
-def ShowRootPlot(f, root: float, range: Range, accurasy: float):
-
-    """
-    Show plot of your func on the arry with root point
-
-    Use only numpy math functions
-    """
-
-    try:
-        t = np.arange(range.start, range.end, accurasy)
-        fig, ax = plot.subplots()
-        ax.set_title("Root: " + str(root) + " +- " + str(accurasy))
-        plot.grid(which='minor', color = 'k', linestyle = ':')
-        plot.grid(which='major', color = 'k', linewidth = 1,linestyle = ':')
-        plot.plot(t, f(t), "r--")
-        plot.plot([root], [f(root)], "bo")
-        plot.show()
-    except BaseException:
-        print("\n!!! PLOT ERROR\n")
-        print(TextException())

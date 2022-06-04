@@ -27,7 +27,7 @@ def main():
 
     try:
 
-        x = BasicIter(FUNC, PHI, X0, EPS, MAX_COUNTER_VALUE)
+        x = BasicIter(FUNC, PHI, X0, EPS, 52)
 
         print(
             "\nRoot was successfully found:\n",

@@ -8,7 +8,7 @@ from base_objs import *
 
 
 # DEBUG lvl (0 - off,  1 - simple,  2 - full)
-DEBUG = 1
+DEBUG = 2
 
 
 # (DEBUG) default size for column with float type value

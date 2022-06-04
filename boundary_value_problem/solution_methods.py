@@ -14,7 +14,7 @@ from base_objs import *
 
 
 # ! disable debug if calculations are really big for optimisation
-DEBUG = FALSE
+DEBUG = 1
 
 MAX_ITERATIONS_COUNT = 1e3
 
@@ -273,6 +273,6 @@ def BoundValPuassonRectEq(f: lambda_type, rect: RECT_DOUBLE, conds: RECT_FUNC, x
     Solve the system
     """
     x = np.array([1.0 for i in range(i_max)])
-    x = LinAlgRelax(x, matr, rvec, accuracy, 0.9)
+    x = LinAlgRelax(x, matr, rvec, accuracy, 1.9)
 
     return x
