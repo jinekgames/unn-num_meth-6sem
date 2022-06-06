@@ -1,0 +1,7 @@
+# reports
+*.doc
+*.docx
+*.rtf
+
+# debug files of da project
+eq sys matr.txt
